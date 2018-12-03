@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Ini juga keren</title>
+    <script src="js/three.min.js"></script>
+    <script src="js/dat.gui.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000000;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="canvas"></div>
+    <script type="text/javascript">
+        function init() {
+            var mouseX, mouseY;
+            var step = 0;
+
+            var scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x000000, 0.0007);
+
+            var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setClearColor('#000000');
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            camera.position.x = 0;
+            camera.position.y = 10;
+            camera.position.z = 500;
+
+            camera.lookAt(scene.position);
+
+            document.getElementById("canvas").appendChild(renderer.domElement);
+
+
+            var cloud;
+            createParticles();
+            render();
+
+            function createParticles() {
+                var geometry = new THREE.Geometry();
+                var material = new THREE.PointsMaterial({
+                    size: 2, 
+                    vertexColors: true, 
+                    color: 0xffffff
+                });
+                
+                for (var x = -50; x < 50; x++) {
+                    for (var y = -50; y < 50; y++) {
+                        var particle = new THREE.Vector3(x * 10, 0, y * 10);
+                        geometry.vertices.push(particle);
+                        geometry.colors.push(new THREE.Color((Math.random() * (1000 - 750) + 750 * 0x00ffff)));
+                    }
+                }
+
+                cloud = new THREE.Points(geometry, material);
+                cloud.sortParticles = true;
+                cloud.position.x -= x/20;
+                cloud.position.z -= x/20;
+                scene.add(cloud);
+            }
+
+            function render() {
+                step += 0.005;
+                var geometry = cloud.geometry;
+                geometry.vertices.forEach(function(v) {
+                    v.y = (Math.sin((v.x / 2 + step) * Math.PI * 2 )
+                        + Math.cos((v.z / 2 + step * 2) * Math.PI )
+                        + Math.sin((v.x + v.y + step * 2) / 4 * Math.PI)) / 2;
+                 });
+                
+                requestAnimationFrame(render);
+                renderer.render(scene, camera);
+
+                geometry.verticesNeedUpdate = true; 
+            }
+        }
+
+        window.onload = init;
+
+    </script>
+</body>
+
+</html>

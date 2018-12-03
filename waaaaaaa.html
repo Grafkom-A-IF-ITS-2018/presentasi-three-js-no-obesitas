@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Ini keren</title>
+    <script src="js/three.min.js"></script>
+    <script src="js/dat.gui.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000000;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="canvas"></div>
+    <script type="text/javascript">
+        function init() {
+            var mouseX, mouseY;
+
+            var scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x000000, 0.0007);
+
+            var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setClearColor('#000000');
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            camera.position.x = 0;
+            camera.position.y = 0;
+            camera.position.z = 1000;
+
+            document.getElementById("canvas").appendChild(renderer.domElement);
+
+
+            var cloud;
+            createParticles();
+            render();
+
+            function createParticles() {
+                var geometry = new THREE.Geometry();
+                var material = new THREE.PointsMaterial({
+                    size: 2, 
+                    vertexColors: true, 
+                    color: 0xffffff
+                });
+                
+                for (var x = 0; x < 20000; x++) {
+                    var particle = new THREE.Vector3(Math.random() * 3000 - 1000 / 2, Math.random() * 3000 - 1000 / 2, Math
+                        .random() * 3000 - 1000 / 2);
+                    geometry.vertices.push(particle);
+                    geometry.colors.push(new THREE.Color((Math.abs(x) + 10) * 0x00ffff));
+                }
+
+                cloud = new THREE.Points(geometry, material);
+                cloud.rotation.x = Math.random() * 6;
+                cloud.rotation.y = Math.random() * 6;
+                cloud.rotation.z = Math.random() * 6;
+                scene.add(cloud);
+
+                document.addEventListener('mousemove', onDocumentMouseMove, false);
+            }
+
+            function render() {
+                var time = Date.now() * 0.00005;
+
+                for (i = 0; i < scene.children.length; i++) {
+                    var object = scene.children[i];
+                    
+                    if (object instanceof THREE.Points) {
+                        object.rotation.y = time * (i < 4 ? i + 1 : -(i + 1));
+                    }
+                }
+
+                requestAnimationFrame(render);
+                renderer.render(scene, camera);
+            }
+
+            function onDocumentMouseMove(e) {
+                mouseX = e.clientX - window.innerWidth / 2;
+                mouseY = e.clientY - window.innerHeight / 2;
+            }
+        }
+
+        window.onload = init;
+
+    </script>
+</body>
+
+</html>

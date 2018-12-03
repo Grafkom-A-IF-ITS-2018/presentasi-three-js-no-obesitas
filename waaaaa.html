@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Bisa pake sprite</title>
+    <script src="js/three.min.js"></script>
+    <script src="js/dat.gui.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000000;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="canvas"></div>
+    <script type="text/javascript">
+        function init() {
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setClearColor('#000000');
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            camera.position.x = 0;
+            camera.position.y = 0;
+            camera.position.z = 150;
+
+            document.getElementById("canvas").appendChild(renderer.domElement);
+
+            var cloud;
+
+            var controls = new function () {
+                this.size = 10;
+                this.sprite = 0;
+                this.transparent = true;
+                this.opacity = 0.6;
+                this.color = 0xffffff;
+
+                this.redraw = function () {
+                    scene.remove(scene.getObjectByName("particles"));
+
+                    createSprite(controls.size, controls.transparent, controls.opacity, controls.color, controls.sprite);
+                };
+            };
+
+            var gui = new dat.GUI();
+            gui.add(controls, 'sprite', 0, 4).step(1).onChange(controls.redraw);
+            gui.add(controls, 'size', 0, 10).onChange(controls.redraw);
+            gui.add(controls, 'transparent').onChange(controls.redraw);
+            gui.add(controls, 'opacity', 0, 1).onChange(controls.redraw);
+            gui.addColor(controls, 'color').onChange(controls.redraw);
+
+            controls.redraw();
+
+            render();
+
+            function createSprite(size, transparent, opacity, color, spriteNumber) {
+                var texturePath = 'assets/sprite-sheet.png';
+                var texture = new THREE.TextureLoader().load(texturePath);
+
+                var spriteMaterial = new THREE.SpriteMaterial({
+                    opacity: opacity,
+                    color: color,
+                    transparent: transparent,
+                    map: texture
+                });
+
+                spriteMaterial.map.offset = new THREE.Vector2(0.2 * spriteNumber, 0);
+                spriteMaterial.map.repeat = new THREE.Vector2(1 / 5, 1);
+                spriteMaterial.depthTest = false;
+                spriteMaterial.blending = THREE.AdditiveBlending;
+
+                var sprite = new THREE.Sprite(spriteMaterial);
+                sprite.scale.set(size, size, size);
+                sprite.position.set(0, 0, 0);
+                sprite.velocityX = -1;
+                sprite.name = "particles";
+
+                scene.add(sprite);
+            }
+
+            var spriteNumber = 0;
+            function render() {
+                scene.children.forEach(function (e) {
+                    if (e instanceof THREE.Sprite) {
+                        e.position.x = e.position.x + e.velocityX;
+
+                        if (e.position.x > 100) {
+                            e.velocityX = -1;
+                            e.material.map.offset.set(0.2 * spriteNumber, 0);
+                        }
+
+                        if (e.position.x < -100) {
+                            e.velocityX = 1;
+
+                            if (spriteNumber > 3) {
+                                spriteNumber = 0;
+                            } else {
+                                spriteNumber++;
+                            }
+                        }
+                    }
+                });
+
+                requestAnimationFrame(render);
+                renderer.render(scene, camera);
+            }
+        }
+
+        window.onload = init;
+
+    </script>
+</body>
+
+</html>

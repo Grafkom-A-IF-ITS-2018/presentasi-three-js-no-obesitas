@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Bisa pake model</title>
+    <script src="js/three.min.js"></script>
+    <script src="js/dat.gui.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000000;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="canvas"></div>
+    <script type="text/javascript">
+        function init() {
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setClearColor('#000000');
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            camera.position.x = 0;
+            camera.position.y = 0;
+            camera.position.z = 150;
+
+            document.getElementById("canvas").appendChild(renderer.domElement);
+
+            var geometry = new THREE.TorusGeometry(50, 30, 20, 100);
+            var material = new THREE.MeshBasicMaterial({ 
+                color: 0xffff00 
+            });
+            var torus = new THREE.Mesh(geometry, material );
+            //scene.add(torus);
+
+            var materialCloud = new THREE.PointCloudMaterial({
+                color: 0xffffff,
+                size: 1,
+                transparent: true
+            });
+
+            var cloud = new THREE.PointCloud(geometry, materialCloud);
+            cloud.sortParticles = true;
+            scene.add(cloud);
+
+            var wire = new THREE.LineBasicMaterial({ 
+                color: 0xffffff, linewidth: 2 
+            });
+            var wireframe = new THREE.LineSegments(geometry, wire);
+            //scene.add(wireframe);
+
+            render();
+
+            function render() {
+                torus.rotation.x += 0.01;
+                torus.rotation.y += 0.01;
+                cloud.rotation.x += 0.01;
+                cloud.rotation.y += 0.01;
+
+
+                requestAnimationFrame(render);
+                renderer.render(scene, camera);
+            }
+        }
+
+        window.onload = init;
+
+    </script>
+</body>
+
+</html>

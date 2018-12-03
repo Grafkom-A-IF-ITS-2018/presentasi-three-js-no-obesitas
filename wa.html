@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Particle menggunakan Sprite</title>
+    <script src="js/three.min.js"></script>
+    <script src="js/dat.gui.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000000;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="canvas"></div>
+    <script type="text/javascript">
+        function init() {
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setClearColor('#000000');
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            camera.position.x = 0;
+            camera.position.y = 0;
+            camera.position.z = 150;
+
+            document.getElementById("canvas").appendChild(renderer.domElement);
+
+            createSprites();
+            render();
+
+            function createSprites() {
+                var material = new THREE.SpriteMaterial();
+
+                for (var x = -5; x < 5; x++) {
+                    for (var y = -5; y < 5; y++) {
+                        var sprite = new THREE.Sprite(material);
+                        sprite.position.set(x * 10, y * 10, 0);
+
+                        scene.add(sprite);
+                    }
+                }
+            }
+
+
+            function render() {
+                requestAnimationFrame(render);
+
+                renderer.render(scene, camera);
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+
+</html>
