@@ -40,13 +40,13 @@
             var torus = new THREE.Mesh(geometry, material );
             //scene.add(torus);
 
-            var materialCloud = new THREE.PointCloudMaterial({
+            var materialCloud = new THREE.PointsMaterial({
                 color: 0xffffff,
                 size: 1,
                 transparent: true
             });
 
-            var cloud = new THREE.PointCloud(geometry, materialCloud);
+            var cloud = new THREE.Points(geometry, materialCloud);
             cloud.sortParticles = true;
             scene.add(cloud);
 
